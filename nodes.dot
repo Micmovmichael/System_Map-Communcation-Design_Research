@@ -1,0 +1,108 @@
+digraph G {
+    // 设置背景颜色为黑色
+    bgcolor="black";
+    
+    // 设置全局的节点和边的样式
+    fontname="Helvetica,Arial,sans-serif";
+    node [fontcolor="white", color="white", fontsize=20, style="filled", shape="box", fillcolor="#444444", fontname="Helvetica,Arial,sans-serif", penwidth=2];
+    edge [color="white", arrowhead="none", penwidth=2,fontname="Helvetica,Arial,sans-serif", fontsize=20];
+
+    // 设置图的排列方向
+    rankdir=LR;
+
+    // 媒体子图
+    subgraph cluster_media {
+        margin=20;
+        color="#6b6b6b";
+        label = <<font point-size="50" color="#FFFFFF" >Media</font>>;
+        labelloc=b;
+        style="filled";
+        fillcolor="#333333";
+
+        // 植物子图
+        subgraph cluster_plants {
+            margin=50;
+            style="filled";
+            fillcolor="#285943";
+            label = <<font point-size="30">Plants</font>>;
+            rankdir=TB;
+
+            // 植物子图的元素
+            p0 [fillcolor="#397D49"];
+            p1 [fillcolor="#397D49"];
+            p2 [fillcolor="#397D49"];
+            p3 [fillcolor="#397D49"];
+        }
+
+        // 动物子图
+        subgraph cluster_animals {
+            margin=50;
+            style="filled";
+            fillcolor="#708238";
+            label = <<font point-size="30">Animals</font>>;
+            rankdir=TB;
+
+            // 动物子图的元素
+            鹤 [fillcolor="#8CBF5F"];
+            肠道菌落 [fillcolor="#8CBF5F"];
+            大猩猩 [fillcolor="#8CBF5F"];
+            蜜蜂 [fillcolor="#8CBF5F"];
+        }
+
+        // 机器子图
+        subgraph cluster_machine {
+            margin=50;
+            style="filled";
+            fillcolor="#B2A33";
+            label = <<font point-size="30">Machines</font>>;
+            rankdir=TB;
+
+            // 机器子图的元素
+            m0 [fillcolor="#CCCC52"];
+            m1 [fillcolor="#CCCC52"];
+            m2 [fillcolor="#CCCC52"];
+            m3 [fillcolor="#CCCC52"];
+        }
+    }
+
+    // 人类子图
+    subgraph cluster_human {
+        margin=20;
+        color="#6b6b6b";
+        labelloc=b;
+        label = <<font point-size="50" color="#FFFFFF">Human</font>>;
+        rank=same;
+        style="filled";
+        fillcolor="#555555";
+
+        // 人类子图的元素
+        泛人类 [fillcolor="#777777"];
+         残疾人 [fillcolor="#777777"];
+         植物人 [fillcolor="#777777"];
+         精神病人 [fillcolor="#777777"];
+    }
+    
+    // 上帝子图
+    subgraph cluster_god {
+        margin=20;
+        labelloc=b;
+        color="#6b6b6b";
+        label = <<font point-size="50" color="#FFFFFF">God</font>>;
+        rank=same;
+        style="filled";
+        fillcolor="#555555";
+
+        // 上帝子图的元素
+        g1 [fillcolor="#777777"];
+        g2 [fillcolor="#777777"];
+    }
+    
+
+    // 连接元素之间的关系
+    泛人类 -> 肠道菌落;
+    泛人类 -> p1;
+    泛人类 -> m1;
+    肠道菌落 -> g1;
+    m1 -> g1;
+    p1 -> g1;
+}

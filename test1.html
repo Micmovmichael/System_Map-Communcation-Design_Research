@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Visualization</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            position: relative;
+            height: 100vh;
+            margin: 0;
+        }
+        .columns {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .category {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .node {
+            margin-left: 20px;
+            padding: 5px;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+        .node.selected {
+            background-color: yellow;
+        }
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .textbox-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .textbox-container input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+        .add-node-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .add-node-container input, .add-node-container select, .add-node-container button {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="columns" id="columns">
+    <!-- Columns will be dynamically populated here -->
+</div>
+
+<svg width="100%" height="100%">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#000"></path>
+        </marker>
+    </defs>
+</svg>
+
+<div class="textbox-container">
+    <input type="text" id="textbox1" placeholder="First Node Text" readonly>
+    <input type="text" id="textbox2" placeholder="Second Node Text" readonly>
+    <input type="text" id="textbox3" placeholder="Combined Text" readonly>
+</div>
+
+<script>
+    let data;
+    fetch('data.json')
+        .then(response => response.json())
+        .then(json => {
+            data = json;
+            renderColumns();
+        });
+
+    function renderColumns() {
+        const columnsContainer = document.getElementById('columns');
+        columnsContainer.innerHTML = '';
+        data.columns.forEach(column => {
+            const columnDiv = document.createElement('div');
+            columnDiv.className = 'column';
+            columnDiv.id = column.id;
+
+            column.categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.textContent = category.name;
+
+                category.nodes.forEach(node => {
+                    const nodeDiv = document.createElement('div');
+                    nodeDiv.className = 'node';
+                    nodeDiv.textContent = node;
+                    nodeDiv.dataset.column = column.id;
+                    nodeDiv.dataset.category = category.name;
+                    categoryDiv.appendChild(nodeDiv);
+                });
+
+                columnDiv.appendChild(categoryDiv);
+            });
+
+            const addNodeContainer = document.createElement('div');
+            addNodeContainer.className = 'add-node-container';
+
+            const newNodeInput = document.createElement('input');
+            newNodeInput.type = 'text';
+            newNodeInput.placeholder = 'New Node';
+
+            const categorySelect = document.createElement('select');
+            column.categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+
+            const addButton = document.createElement('button');
+            addButton.textContent = 'Add Node';
+            addButton.addEventListener('click', () => {
+                const nodeName = newNodeInput.value;
+                const categoryName = categorySelect.value;
+                if (nodeName) {
+                    addNode(column.id, categoryName, nodeName);
+                    newNodeInput.value = '';
+                }
+            });
+
+            addNodeContainer.appendChild(newNodeInput);
+            addNodeContainer.appendChild(categorySelect);
+            addNodeContainer.appendChild(addButton);
+
+            columnDiv.appendChild(addNodeContainer);
+            columnsContainer.appendChild(columnDiv);
+        });
+
+        attachNodeClickEvents();
+    }
+
+    function attachNodeClickEvents() {
+    const nodes = document.querySelectorAll('.node');
+    let selectedNodes = [];
+
+    nodes.forEach(node => {
+        node.addEventListener('click', () => {
+            if (selectedNodes.length < 2) {
+                node.classList.add('selected');
+                selectedNodes.push(node);
+                updateTextBoxes(selectedNodes);
+                if (selectedNodes.length === 2) {
+                    drawLine(selectedNodes);
+                    selectedNodes = [];
+                }
+            }
+        });
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Backspace' && selectedNodes.length > 0) {
+            deleteNode(selectedNodes[0]);
+            selectedNodes = [];
+        }
+    });
+}
+
+function deleteNode(node) {
+    const columnId = node.dataset.column;
+    const categoryName = node.dataset.category;
+    const nodeName = node.textContent;
+
+    const column = data.columns.find(col => col.id === columnId);
+    const category = column.categories.find(cat => cat.name === categoryName);
+    const nodeIndex = category.nodes.indexOf(nodeName);
+    
+    if (nodeIndex > -1) {
+        category.nodes.splice(nodeIndex, 1);
+        saveData();
+        renderColumns();
+    }
+}
+
+    function updateTextBoxes(selectedNodes) {
+        if (selectedNodes.length > 0) {
+            document.getElementById('textbox1').value = selectedNodes[0].textContent;
+        }
+        if (selectedNodes.length > 1) {
+            document.getElementById('textbox2').value = selectedNodes[1].textContent;
+            document.getElementById('textbox3').value = selectedNodes[0].textContent + " " + selectedNodes[1].textContent;
+        }
+    }
+
+    function drawLine(selectedNodes) {
+        const svg = document.querySelector('svg');
+        const [node1, node2] = selectedNodes;
+        const rect1 = node1.getBoundingClientRect();
+        const rect2 = node2.getBoundingClientRect();
+        
+        const x1 = rect1.left + rect1.width / 2 + window.scrollX;
+        const y1 = rect1.top + rect1.height / 2 + window.scrollY;
+        const x2 = rect2.left + rect2.width / 2 + window.scrollX;
+        const y2 = rect2.top + rect2.height / 2 + window.scrollY;
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', 'black');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('marker-end', 'url(#arrow)');
+        svg.appendChild(line);
+
+        selectedNodes.forEach(node => node.classList.remove('selected'));
+    }
+
+    function addNode(columnId, categoryName, nodeName) {
+        const column = data.columns.find(col => col.id === columnId);
+        const category = column.categories.find(cat => cat.name === categoryName);
+        category.nodes.push(nodeName);
+        saveData();
+        renderColumns();
+    }
+
+    function saveData() {
+    fetch('http://10.20.99.214:3000/saveData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data,null,2)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        console.log('Data saved successfully');
+    })
+    .catch(error => {
+        console.error('Error saving data:', error);
+    });
+}
+
+</script>
+
+</body>
+</html>

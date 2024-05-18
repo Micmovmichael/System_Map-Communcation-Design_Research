@@ -1,0 +1,79 @@
+{
+  "columns": [
+    {
+      "id": "column1",
+      "categories": [
+        {
+          "name": "Spiritual Pursuit",
+          "nodes": [
+            "God(s), worship...",
+            "Justice (earthly)"
+          ]
+        },
+        {
+          "name": "Knowledge Creation",
+          "nodes": [
+            "Knowledge, book, movie...",
+            "God(s), worship..."
+          ]
+        },
+        {
+          "name": "Emotion Socializing",
+          "nodes": [
+            "God(s), worship...",
+            "Knowledge, book, movie..."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "column2",
+      "categories": [
+        {
+          "name": "Sound",
+          "nodes": [
+            "Loudness",
+            "Pitch"
+          ]
+        },
+        {
+          "name": "Light/Look",
+          "nodes": [
+            "Color",
+            "Shape",
+            "xjejdjdj"
+          ]
+        },
+        {
+          "name": "Smell",
+          "nodes": [
+            "Intensity",
+            "Duration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "column3",
+      "categories": [
+        {
+          "name": "Emotion Socializing",
+          "nodes": [
+            "Collaboration",
+            "Pairing",
+            "111",
+            "222",
+            "444"
+          ]
+        },
+        {
+          "name": "Survival",
+          "nodes": [
+            "Defense",
+            "Habitat"
+          ]
+        }
+      ]
+    }
+  ]
+}
